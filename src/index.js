@@ -15,9 +15,16 @@ const Impure = {
   })
 };
 
+const img = url => $('<img />', { src: url });
+
 const url = term =>
   `https://api.flickr.com/services/feeds/photos_public.gne?tags=${term}&format=json&jsoncallback=?`;
 
-const app = _.compose(Impure.getJSON(trace("response")), url);
+const mediaUrl = _.compose(_.prop('m'), _.prop('media'));
+const srcs = _.compose(_.map(mediaUrl), _.prop('items'));
+
+const images = _.compose(_.map(img), srcs);
+const renderImages = _.compose(Impure.setHtml('body'), images);
+const app = _.compose(Impure.getJSON(renderImages), url);
 
 app("cats");
