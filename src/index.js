@@ -1,8 +1,23 @@
-document.getElementById("app").innerHTML = `
-<h1>Hello Parcel!</h1>
-<div>
-  Look
-  <a href="https://parceljs.org" target="_blank" rel="noopener noreferrer">here</a>
-  for more info about Parcel.
-</div>
-`;
+import _ from "rambda";
+import $ from "jquery";
+
+const trace = _.curry((tag, x) => {
+  console.log(tag, x);
+  return x;
+});
+
+const Impure = {
+  getJSON: _.curry((callback, url) => {
+    $.getJSON(url, callback);
+  }),
+  setHtml: _.curry((sel, html) => {
+    $(sel).html(html);
+  })
+};
+
+const url = term =>
+  `https://api.flickr.com/services/feeds/photos_public.gne?tags=${term}&format=json&jsoncallback=?`;
+
+const app = _.compose(Impure.getJSON(trace("response")), url);
+
+app("cats");
